@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD033 MD041 -->
 <div align="center">
 
+<img alt="LOGO" src="https://github.com/user-attachments/assets/b8e4d737-d549-43f3-a2e7-a3727bf615a9" width="256" height="256" />
+
 # M9A
 
 基于全新架构的 亿韭韭韭 小助手。图像技术 + 模拟控制，解放双手！  
@@ -33,7 +35,7 @@
 - 自动醒梦域
 - 银行购物
 - 领取日常奖励
-- 轶事派遣
+- 当期轶事
 - 雨中悬想：迷思海（"寻思"周扫荡）
 - 局外演绎：山麓的回音（肉鸽）
 
@@ -53,12 +55,21 @@
 - [interface.json编写](./docs/zh_cn/develop/interface.json编写.md)
 - [Pipeline编写](./docs/zh_cn/develop/Pipeline编写.md)
 - [Custom编写](./docs/zh_cn/develop/Custom编写.md)
-- [Bug排查](./docs/zh_cn/develop/Bug排查.md)
 - [项目重构](./docs/zh_cn/develop/项目重构.md)
 - [外服适配](./docs/zh_cn/develop/外服适配.md)
 - [文档编写](./docs/zh_cn/develop/文档编写.md)
 
 更多文档请前往 [MaaFramework](https://github.com/MaaXYZ/MaaFramework) 主仓库查看
+
+## Star History
+
+<a href="https://www.star-history.com/#MaaXYZ/M9A&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MaaXYZ/M9A&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MaaXYZ/M9A&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MaaXYZ/M9A&type=Date" />
+ </picture>
+</a>
 
 ## 鸣谢
 

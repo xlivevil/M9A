@@ -44,21 +44,27 @@ Check out the [GitHub Pull Request Guide for Beginners](https://maa.plus/docs/zh
         | [MaaDebugger](https://github.com/MaaXYZ/MaaDebugger) | Standalone debugging tool |
         | [Maa Pipeline Support](https://marketplace.visualstudio.com/items?itemName=nekosu.maa-support) | VSCode plugin for debugging, screenshots, ROI extraction, color picking, etc. |
         | [ImageCropper](https://github.com/MaaXYZ/MaaFramework/tree/main/tools/ImageCropper) | Standalone tool for screenshots and ROI extraction |
-        | [MFA Tools](https://github.com/SweetSmellFox/MFATools) | Standalone tool for screenshots, ROI extraction, and color picking |
+        | [MFA Tools(Not recommended)](https://github.com/SweetSmellFox/MFATools) | Standalone tool for screenshots, ROI extraction, and color picking |
 
-6. Start developing:
+6. Local installation
+
+   1. Install embedded python (only required for Windows)
+
+      ```bash
+      ./tools/ci/setup_embed_python.ps1
+      ```
+
+   2. Assemble components by running install
+
+      ```bash
+      python ./tools/install.py
+      ```
+
+   Then you can run M9A in the install folder.
+
+7. Start developing:
 
     Enjoy coding! Before starting, check out the [Related Reading](#related-reading).
-
-7. Local installation:
-
-    After debugging and modifying the code, you can install it locally for testing:
-
-    ```bash
-    python ./tools/install.py
-    ```
-
-    You can then run M9A in the `install` folder.
 
 8. Git operations:
 
@@ -163,7 +169,6 @@ pre-commit run --all-files
 - [Writing interface.json](./Writing-interface.json.md)
 - [Writing Pipelines](./Writing-Pipelines.md)
 - [Writing Custom Scripts](./Writing-Custom.md)
-- [Bug Troubleshooting](./Bug-Troubleshooting.md)
 - [Project Refactoring](./Project-Refactoring.md)
 - [Adapting for External Servers](./Adapting-Global-Servers.md)
 - [Writing Documentation](./Writing-Documentation.md)
