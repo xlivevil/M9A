@@ -679,26 +679,6 @@ For Mac users using PlayCover, select PlayCover in the **Controller Type** secti
 
 #### Settings
 
-##### pip Settings
-
-M9A supports configuring pip installation related settings through the `config/pip_config.json` file. Generally, you don't need to modify this file unless you have special requirements.
-
-  <details>
-    <summary>config/pip_config.json Example</summary>
-    <p></p>
-    <blockquote>
-
-```jsonc
-{
-    "enable_pip_install": true, // Whether to enable pip installation, default true
-    "mirror": "https://pypi.tuna.tsinghua.edu.cn/simple", // Mirror source
-    "backup_mirror": "https://mirrors.ustc.edu.cn/pypi/simple", // Backup mirror sources
-}
-```
-
-  </blockquote>
-  </details>
-
 ##### Resource Hot Update Configuration
 
 M9A supports configuring hot update settings for certain resources (such as activity opening times) via the `config/hot_update.json` file.

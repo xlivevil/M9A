@@ -24,7 +24,7 @@ icon: hugeicons:structure-01
     - utils/ # Utility functions
     - __init__.py # Module initialization
     - agent_runtime.py # Agent server entry
-    - bootstrap.py # Agent bootstrap & venv management
+    - bootstrap.py # Agent Linux launcher (venv & dependency setup)
     - main.py # Main entry point
 - data/ # Data
 - docs/ # Documentation directory

@@ -680,26 +680,6 @@ Mac 用户使用 PlayCover 时，在连接区域的**控制器类型**中选择 
 
 #### 配置文件
 
-##### pip 配置
-
-M9A 支持通过 `config/pip_config.json` 文件配置 pip 安装相关设置。一般情况下，您无需修改此文件，除非您有特殊需求。
-
-  <details>
-    <summary>config/pip_config.json 示例</summary>
-    <p></p>
-    <blockquote>
-
-```jsonc
-{
-    "enable_pip_install": true, // 是否启用 pip 安装，默认 true
-    "mirror": "https://pypi.tuna.tsinghua.edu.cn/simple", // 镜像源
-    "backup_mirror": "https://mirrors.ustc.edu.cn/pypi/simple", // 备用镜像源
-}
-```
-
-  </blockquote>
-  </details>
-
 ##### 资源热更配置
 
 M9A 支持通过 `config/hot_update.json` 文件配置部分资源（例如活动开放时间）热更相关设置。

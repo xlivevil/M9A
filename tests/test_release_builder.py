@@ -1,4 +1,3 @@
-import hashlib
 import json
 import os
 import subprocess
@@ -49,6 +48,7 @@ def prepare_release_project(
     (root / ".create-maa-project/runtime/mfaa/win-x64/MFAAvalonia.exe").write_bytes(b"gui")
     (root / ".create-maa-project/runtime/python/win-x64/python.exe").write_bytes(b"python")
     (root / "agent/bootstrap.py").write_text("# bootstrap\n", encoding="utf-8")
+    (root / "agent/main.py").write_text("# main\n", encoding="utf-8")
     (root / "agent/__pycache__/main.cpython-313.pyc").write_bytes(b"cache")
     (root / "agent/main.pyo").write_bytes(b"cache")
     (root / "requirements.txt").write_text("maafw\n", encoding="utf-8")
@@ -70,18 +70,47 @@ def run_release_builder(root: Path) -> subprocess.CompletedProcess[str]:
     )
 
 
+def test_release_agent_child_args_per_platform() -> None:
+    script_url = (PROJECT_ROOT / "tools" / "build-release.mjs").as_uri()
+    code = (
+        "import {releaseAgentChildArgs} from " + json.dumps(script_url) + ";"
+        "console.log(JSON.stringify(["
+        "releaseAgentChildArgs('win-x64'),"
+        "releaseAgentChildArgs('osx-arm64'),"
+        "releaseAgentChildArgs('linux-x64')"
+        "]));"
+    )
+    result = subprocess.run(
+        ["node", "--input-type=module", "-e", code],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert json.loads(result.stdout.strip().splitlines()[-1]) == [
+        ["-u", "agent/main.py"],
+        ["-u", "agent/main.py"],
+        ["-u", "agent/bootstrap.py"],
+    ]
+
+
 def test_release_package_excludes_python_cache_files(tmp_path: Path) -> None:
     prepare_release_project(tmp_path)
     result = run_release_builder(tmp_path)
 
     assert result.returncode == 0, result.stdout + result.stderr
-    package_agent = tmp_path / "dist/package-mfaa/agent"
+    package_root = tmp_path / "dist/package-mfaa"
+    package_agent = package_root / "agent"
     assert (package_agent / "bootstrap.py").is_file()
+    assert (package_agent / "main.py").is_file()
     assert not (package_agent / "__pycache__").exists()
     assert not (package_agent / "main.pyo").exists()
-    requirements = (tmp_path / "dist/package-mfaa/requirements.txt").read_bytes()
-    marker = tmp_path / "dist/package-mfaa/python/.create-maa-project-requirements.sha256"
-    assert marker.read_text(encoding="utf-8") == hashlib.sha256(requirements).hexdigest() + "\n"
+    packaged_interface = json.loads((package_root / "interface.json").read_text(encoding="utf-8"))
+    assert packaged_interface["agent"][0]["child_args"] == ["-u", "agent/main.py"]
+    # win/mac runtimes ship with preinstalled dependencies: no wheelhouse inputs
+    assert not (package_root / "requirements.txt").exists()
+    assert not (package_root / "python/.create-maa-project-requirements.sha256").exists()
 
 
 def test_release_package_includes_translation_files(tmp_path: Path) -> None:
