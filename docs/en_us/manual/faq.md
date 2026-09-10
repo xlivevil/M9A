@@ -1,35 +1,20 @@
-# Frequently Asked Questions (FAQ)
+---
+order: 2
+icon: ph:question-fill
+---
 
-- [Frequently Asked Questions (FAQ)](#frequently-asked-questions-faq)
-  - [Software Fails to Run / Crashes / Reports Errors](#software-fails-to-run--crashes--reports-errors)
-    - [Download/Installation Issues](#downloadinstallation-issues)
-    - [Crashes During Runtime](#crashes-during-runtime)
-    - [Runtime Library Issues (Windows)](#runtime-library-issues-windows)
-    - [Agent Long Time Wait (Windows)](#agent-long-time-wait-windows)
-    - [Resource Loading Issues](#resource-loading-issues)
-    - [Connection Issues](#connection-issues)
-      - [1. Confirm ADB and Connection Address are Correct](#1-confirm-adb-and-connection-address-are-correct)
-      - [2. Close Existing ADB Processes](#2-close-existing-adb-processes)
-      - [3. Correctly Use Multiple ADB Instances](#3-correctly-use-multiple-adb-instances)
-      - [4. Change Touch Control Mode](#4-change-touch-control-mode)
-      - [5. Switch to MaaPiCli](#5-switch-to-maapicli)
-      - [6. Avoid Game Boosters](#6-avoid-game-boosters)
-      - [7. Restart Your Computer](#7-restart-your-computer)
-      - [8. Change Emulator](#8-change-emulator)
-  - [Slow File Download Speed](#slow-file-download-speed)
-  - [Other Issues](#other-issues)
+# Frequently Asked Questions (FAQ)
 
 ## Software Fails to Run / Crashes / Reports Errors
 
 Most problems can be solved in this section.
-They are divided into Download/Installation Issues, Runtime Library Issues, Agent Long Time Wait Issues, Resource Loading Issues, and Connection Issues.
+They are divided into Download/Installation Issues, Crashes During Runtime, Runtime Library Issues, Agent Long Time Wait Issues, Resource Loading Issues, and Connection Issues.
 Most issues fall under **Runtime Library Issues** and **Connection Issues**.
 
 ### Download/Installation Issues
 
-The complete M9A software package is named in the format "M9A-`Platform`-`Architecture`-`Version`.zip". Others are "parts" that cannot be used alone. Please read carefully.
-~~In most cases, you need the x64 architecture M9A, meaning you should download `M9A-win-x86_64-vXXX.zip`, not `M9A-win-aarch64-vXXX.zip`.~~
-M9A Windows no longer supports this architecture.
+The complete M9A software package is named in the format "M9A-`Platform`-`Architecture`-`Version`.zip". Others are "parts" that cannot be used alone. Please read carefully.  
+In most cases, you need the x64 architecture M9A, meaning you should download `M9A-win-x86_64-vXXX.zip`, not `M9A-win-aarch64-vXXX.zip`.
 
 ### Crashes During Runtime
 
@@ -58,10 +43,10 @@ If you encounter the following when opening the software, you need to update the
 
 2. When using MaaPiCli, you see `Application Error: The application was unable to start correctly`
 
-The above generally indicate runtime library issues. You need to [update the runtime libraries](./newbie.md#2-install-runtime-environment).
+The above generally indicate runtime library issues. You need to [update the runtime libraries](./newbie.md#_2-install-runtime-environment).
 
 If updating the runtime libraries still doesn't solve the problem, both startup methods **crash immediately**, and no log files are generated in the current directory, it's likely another dependency-related issue.
-Please report it on the [project Issues page](https://github.com/MaaXYZ/M9A/issues).
+Please report it on the [project Issues page](https://github.com/MAA1999/M9A/issues).
 
 ### Agent Long Time Wait (Windows)
 
@@ -70,7 +55,7 @@ When using a generic UI (such as MFAAvalonia), there is a long period of unrespo
 ### Resource Loading Issues
 
 When this problem occurs, it prompts **Resource loading failed**.
-The solution is to delete the entire folder and then [download](https://github.com/MaaXYZ/M9A/releases) and install M9A again.
+The solution is to delete the entire M9A folder (back up the `config` directory first if you want to keep your settings), and then [re-download](https://github.com/MAA1999/M9A/releases) and install M9A again.
 
 ### Connection Issues
 
@@ -79,7 +64,7 @@ There are many reasons for connection failure. Please try the following steps on
 
 #### 1. Confirm ADB and Connection Address are Correct
 
-Refer to [Connection Settings](./connection.md#connection-settings)
+Refer to [Connection Settings](./connection.md)
 
 > [!TIP]
 >
@@ -99,7 +84,7 @@ Some emulators (like BlueStacks China, NoxPlayer, etc.) might have older adb ver
 
 #### 5. Switch to MaaPiCli
 
-If you fail to connect using MFAWPF, try using MaaPiCli instead. [Usage Guide](MaaPiCli.md)
+If you fail to connect using MFAWPF, try using MaaPiCli instead. [Usage Guide](./cli.md)
 
 #### 6. Avoid Game Boosters
 
@@ -121,9 +106,37 @@ Generally, MuMu12 or LDPlayer 9 are recommended.
 1. Update using [MirrorChyan](MirrorChyan.md).
 2. Ask for help in the community group / search online for related solutions.
 
+## Slow or Failed Dependency Installation (Linux)
+
+On Linux, M9A automatically creates a Python virtual environment and installs dependencies online on first launch. If dependency downloads are slow or fail, configure a pip mirror and launch M9A again:
+
+```bash
+export PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+Or write it into pip's global configuration (applies to all future launches):
+
+```bash
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+## Yellow Warning Messages in Logs
+
+When starting tasks, you may see yellow warning messages similar to the following in the logs:
+
+```plaintext
+Failed to get resource/manifest.json: ("Connection aborted.
+ConnectionResetError(10054, 'The remote host forcibly closed an existing connection.; None,10054,None))
+No available resource manifest was obtained.
+```
+
+This is usually caused by network issues preventing connection to `api.1999.fan`. It only affects hot updates for a small portion of data, so as long as you keep M9A updated to the latest version there will be no impact and this can be ignored.
+
+For other yellow warning logs, they also usually do not affect operation and can be ignored. If they appear frequently and affect functionality, please provide feedback using the methods below.
+
 ## Other Issues
 
 When you are **sure you have read the common issues above** and **tried to solve them yourself without success**, you can:
 
-1. Go to the [project Issues page](https://github.com/MaaXYZ/M9A/issues) and submit relevant materials **according to the template requirements**.
+1. Go to the [project Issues page](https://github.com/MAA1999/M9A/issues) and submit relevant materials **according to the template requirements**.
 2. Join the M9A Communication QQ Group: 175638678. Ask your question **after reading the group announcement**.

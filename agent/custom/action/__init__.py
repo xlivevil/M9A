@@ -1,26 +1,31 @@
-from .general import *
-from .activity import *
-from .bank import *
-from .combat import *
-from .lucidscape import *
-from .wilderness import *
-from .outside_deduction import *
+from importlib import import_module
 
-__all__ = [
-    "Screenshot",
-    "DisableNode",
-    "NodeOverride",
-    "DuringAct",
-    "DuringAnecdote",
-    "DuringRe_release",
-    "BankPurchaseRecord",
-    "ModifyBankTaskList",
-    "SwitchCombatTimes",
-    "PsychubeDoubleTimes",
-    "LucidscapeStageSelect",
-    "LucidscapeStatusDetect",
-    "TeamSelect",
-    "CombatTargetLevel",
-    "SummonlngSwipe",
-    "SOD_DifficultySelect",
-]
+ACTION_MODULES = (
+    "general",
+    "activity",
+    "balanced_farming",
+    "bank",
+    "char_upgrade",
+    "combat",
+    "lucidscape",
+    "wilderness",
+    "outside_deduction",
+    "reveries_in_the_rain",
+    "syndrome_of_silence",
+    "critter_crash",
+    "redeem_code",
+    "reward",
+    "record_id",
+    "switch_account",
+    "complete_induction",
+    "eight_bit",
+    "warehouse_inventory",
+)
+
+
+def register_all() -> None:
+    for module_name in ACTION_MODULES:
+        import_module(f"custom.action.{module_name}")
+
+
+__all__ = ["register_all"]

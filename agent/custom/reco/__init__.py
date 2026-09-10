@@ -1,5 +1,23 @@
-from .general import *
-from .bank import *
-from .activity import *
+from importlib import import_module
 
-__all__ = ["IsSimilar", "BankShop", "ActivityRe_releaseChapter"]
+RECO_MODULES = (
+    "general",
+    "bank",
+    "activity",
+    "auto_promotion",
+    "auto_trail",
+    "combat",
+    "compare_numbers",
+    "lucidscape",
+    "syndrome_of_silence",
+    "sos_node_template",
+    "critter_crash",
+)
+
+
+def register_all() -> None:
+    for module_name in RECO_MODULES:
+        import_module(f"custom.reco.{module_name}")
+
+
+__all__ = ["register_all"]

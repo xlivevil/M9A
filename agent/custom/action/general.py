@@ -1,74 +1,8 @@
-import os
-import json
-from datetime import datetime
-
-from PIL import Image
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
-
+from maa.custom_action import CustomAction
 from utils import logger
-
-
-@AgentServer.custom_action("Screenshot")
-class Screenshot(CustomAction):
-    """
-    自定义截图动作，保存当前屏幕截图到指定目录。
-
-    参数格式:
-    {
-        "save_dir": "保存截图的目录路径"
-    }
-    """
-
-    def run(
-        self,
-        context: Context,
-        argv: CustomAction.RunArg,
-    ) -> CustomAction.RunResult:
-
-        # image array(BGR)
-        screen_array = context.tasker.controller.post_screencap().wait().get()
-
-        # BGR2RGB
-        if len(screen_array.shape) == 3 and screen_array.shape[2] == 3:
-            rgb_array = screen_array[:, :, ::-1]
-        else:
-            rgb_array = screen_array
-            logger.warning("当前截图并非三通道")
-
-        img = Image.fromarray(rgb_array)
-
-        save_dir = json.loads(argv.custom_action_param)["save_dir"]
-        os.makedirs(save_dir, exist_ok=True)
-        now = datetime.now()
-        img.save(f"{save_dir}/{self._get_format_timestamp(now)}.png")
-        logger.info(f"截图保存至 {save_dir}/{self._get_format_timestamp(now)}.png")
-
-        task_detail = context.tasker.get_task_detail(argv.task_detail.task_id)
-        logger.debug(
-            f"task_id: {task_detail.task_id}, task_entry: {task_detail.entry}, status: {task_detail.status._status}"
-        )
-        for node in task_detail.nodes:
-            logger.debug(
-                f"node_id: {node.node_id}, node_name: {node.name}, completed: {node.completed}"
-            )
-            reco_detail = node.recognition
-            if reco_detail.reco_id == 0:
-                continue
-            logger.debug(
-                f"reco_id: {reco_detail.reco_id}, reco_name: {reco_detail.name}, reco_algorithm: {reco_detail.algorithm}, reco_box: {reco_detail.box}, reco_raw_detail: {reco_detail.raw_detail}"
-            )
-
-        return CustomAction.RunResult(success=True)
-
-    def _get_format_timestamp(self, now):
-
-        date = now.strftime("%Y.%m.%d")
-        time = now.strftime("%H.%M.%S")
-        milliseconds = f"{now.microsecond // 1000:03d}"
-
-        return f"{date}-{time}.{milliseconds}"
+from utils.params import parse_params
 
 
 @AgentServer.custom_action("DisableNode")
@@ -88,7 +22,7 @@ class DisableNode(CustomAction):
         argv: CustomAction.RunArg,
     ) -> CustomAction.RunResult:
 
-        node_name = json.loads(argv.custom_action_param)["node_name"]
+        node_name = parse_params(argv.custom_action_param, "node_name")["node_name"]
 
         context.override_pipeline({f"{node_name}": {"enabled": False}})
 
@@ -113,7 +47,7 @@ class NodeOverride(CustomAction):
         argv: CustomAction.RunArg,
     ) -> CustomAction.RunResult:
 
-        ppover = json.loads(argv.custom_action_param)
+        ppover = parse_params(argv.custom_action_param)
 
         if not ppover:
             logger.warning("No ppover")
@@ -123,3 +57,112 @@ class NodeOverride(CustomAction):
         context.override_pipeline(ppover)
 
         return CustomAction.RunResult(success=True)
+
+
+@AgentServer.custom_action("ResetCount")
+class ResetCount(CustomAction):
+    """
+    重置计数器。
+
+    参数格式:
+    {
+        "nodes": [String], # 目标计数器节点名称列表
+        "strict": bool # 可选，任一节点重置失败时 action 是否视为失败，默认 false
+    }
+    """
+
+    def run(
+        self,
+        context: Context,
+        argv: CustomAction.RunArg,
+    ) -> CustomAction.RunResult:
+
+        try:
+            param = parse_params(argv.custom_action_param)
+        except ValueError as e:
+            logger.error(f"ResetCount: {e}")
+            return CustomAction.RunResult(success=False)
+        nodes = param.get("nodes", None)
+        if not isinstance(nodes, list) or not nodes:
+            logger.error("ResetCount requires non-empty custom_action_param.nodes")
+            return CustomAction.RunResult(success=False)
+
+        strict = param.get("strict", False)
+        if not isinstance(strict, bool):
+            logger.error("ResetCount requires boolean custom_action_param.strict")
+            return CustomAction.RunResult(success=False)
+
+        has_failure = False
+
+        for index, node_name in enumerate(nodes):
+            if not isinstance(node_name, str) or not node_name:
+                log = logger.error if strict else logger.warning
+                log(f"ResetCount received invalid node name in custom_action_param.nodes[{index}]: {node_name!r}")
+                has_failure = True
+                continue
+
+            if not context.clear_hit_count(node_name):
+                log = logger.error if strict else logger.warning
+                log(f"ResetCount failed to clear hit count: index={index}, node={node_name}")
+                has_failure = True
+                continue
+
+            logger.info(f"ResetCount successfully cleared hit count: node={node_name}")
+
+        if has_failure and strict:
+            logger.error("ResetCount failed to clear some nodes in strict mode")
+            return CustomAction.RunResult(success=False)
+
+        return CustomAction.RunResult(success=True)
+
+
+@AgentServer.custom_action("SubTask")
+class SubTask(CustomAction):
+    """
+    按顺序执行子任务。
+
+    参数格式:
+    {
+        "sub": ["任务名称1", "任务名称2"],
+        "continue": false, # 任一子任务失败后是否继续执行后续子任务
+        "strict": true # 任一子任务失败时，当前 action 是否视为失败
+    }
+    """
+
+    def run(
+        self,
+        context: Context,
+        argv: CustomAction.RunArg,
+    ) -> CustomAction.RunResult:
+
+        try:
+            param = parse_params(argv.custom_action_param)
+        except ValueError as e:
+            logger.error(f"SubTask: {e}")
+            return CustomAction.RunResult(success=False)
+
+        sub = param.get("sub", None)
+        if not isinstance(sub, list) or not sub:
+            logger.error("SubTask requires non-empty custom_action_param.sub")
+            return CustomAction.RunResult(success=False)
+
+        continue_on_failure = bool(param.get("continue", False))
+        strict = bool(param.get("strict", True))
+        has_sub_failure = False
+
+        for index, task_name in enumerate(sub):
+            if not isinstance(task_name, str) or not task_name:
+                logger.error(f"SubTask received invalid task name in custom_action_param.sub[{index}]: {task_name!r}")
+                has_sub_failure = True
+                if not continue_on_failure:
+                    break
+                continue
+
+            task_detail = context.run_task(task_name)
+            if task_detail and task_detail.status.failed:
+                logger.error(f"子任务运行失败: index={index}, task={task_name}")
+                has_sub_failure = True
+                if not continue_on_failure:
+                    break
+
+        return CustomAction.RunResult(success=not (has_sub_failure and strict))
